@@ -1,0 +1,25 @@
+name: Build Android APK
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build with Docker (non-root)
+      run: |
+        docker run --rm \
+          -u 1000:1000 \
+          -v $(pwd):/src \
+          -w /src \
+          kivy/buildozer -v android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: APK
+        path: bin/*.apk
+        if-no-files-found: ignore
