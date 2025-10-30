@@ -1,0 +1,41 @@
+name: Build Android APK
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y git zip unzip openjdk-8-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake
+
+    - name: Install Buildozer
+      run: pip install buildozer cython
+
+    - name: Set environment to auto-accept licenses
+      run: |
+        export ANDROID_SDK_ROOT=$HOME/.buildozer/android/platform/android-sdk
+        mkdir -p $HOME/.android
+        echo "### User Sources for Android SDK Manager" > $HOME/.android/repositories.cfg
+        echo "count=0" > $HOME/.android/repositories.cfg
+
+    - name: Build APK with auto-accept
+      run: |
+        yes | buildozer android clean
+        yes | buildozer -v android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: APK
+        path: bin/*.apk
+        retention-days: 7
