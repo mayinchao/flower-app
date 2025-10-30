@@ -1,0 +1,24 @@
+name: Build Android APK
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04  # 使用更稳定的旧版本
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build APK
+      run: |
+        sudo apt update
+        sudo apt install -y python3-pip
+        pip3 install buildozer
+        yes | buildozer -v android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: APK
+        path: bin/*.apk
+        if-no-files-found: ignore
