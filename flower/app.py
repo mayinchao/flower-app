@@ -1892,4 +1892,5 @@ if __name__ == "__main__":
         view=ft.AppView.FLET_APP,  # 使用 Flet 应用视图（移动端优化）
         assets_dir="assets",  # 资源目录（可选）
         name="青芜识界"  # 应用名称
+
     )
