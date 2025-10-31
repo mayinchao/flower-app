@@ -1,0 +1,38 @@
+name: Build Flet APK
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Debug file structure
+      run: |
+        echo "当前目录结构:"
+        find . -name "*.py" -o -name "*.yml" | head -20
+        echo "main.py 内容:"
+        head -5 main.py || echo "main.py 不存在"
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Install Flet
+      run: pip install flet
+      
+    - name: Build APK with Flet
+      run: |
+        ls -la
+        flet build apk --module-name main
+      
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: flet-apk
+        path: build/apk/*.apk
+        if-no-files-found: ignore
+        retention-days: 7
